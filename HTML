@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo do Amor - 1 Mês Juntos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-pink-50 min-h-screen flex flex-col items-center justify-center p-4">
+    <!-- Tela de Início -->
+    <div id="start-screen" class="flex flex-col items-center justify-center text-center max-w-md">
+        <div class="floating mb-8">
+            <i class="fas fa-heart text-red-500 text-6xl heartbeat"></i>
+        </div>
+        <h1 class="text-4xl font-bold text-pink-600 mb-4">Nosso 1º Mês</h1>
+        <p class="text-lg text-gray-700 mb-6">Encontre os pares de memórias especiais do nosso primeiro mês juntos!</p>
+        <button id="start-btn" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+            Começar <i class="fas fa-play ml-2"></i>
+        </button>
+    </div>
+
+    <!-- Jogo de Memória -->
+    <div id="game-container" class="hidden w-full max-w-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <div class="text-xl font-semibold text-pink-700">
+                <i class="fas fa-heart mr-2"></i><span id="pairs">0</span>
+            </div>
+            <div class="text-xl font-semibold text-pink-700">
+                <i class="fas fa-redo mr-2"></i><span id="attempts">0</span>
+            </div>
+            <div class="text-xl font-semibold text-pink-700">
+                <i class="fas fa-clock mr-2"></i><span id="timer">00:00</span>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-4 gap-4 mb-8">
+            <!-- Cartas serão adicionadas dinamicamente -->
+        </div>
+    </div>
+
+    <!-- Mensagem Final -->
+    <div id="message-screen" class="hidden max-w-md text-center">
+        <div class="floating mb-8">
+            <i class="fas fa-heart text-red-500 text-6xl heartbeat"></i>
+            <i class="fas fa-heart text-pink-400 text-6xl heartbeat" style="animation-delay: 0.3s;"></i>
+            <i class="fas fa-heart text-rose-300 text-6xl heartbeat" style="animation-delay: 0.6s;"></i>
+        </div>
+        <h1 class="text-4xl font-bold text-pink-600 mb-6">Feliz 1 Mês, Amor!</h1>
+        
+        <div class="bg-white p-6 rounded-xl shadow-lg mb-8 love-text">
+            <p class="text-gray-800 mb-4">Obrigado por tornar este primeiro mês tão especial...</p>
+            <p class="text-gray-800 mb-4">Cada dia ao seu lado é um presente que eu guardo no coração.</p>
+            <p class="text-gray-800 mb-4">Você trouxe luz à minha vida de uma forma que nunca imaginei possível.</p>
+            <p class="text-gray-800 mb-4">Espero que possamos construir muitos mais memórias juntos.</p>
+            <p class="text-pink-600 font-semibold text-xl mt-4">Te amo mais que todas as estrelas do céu!</p>
+        </div>
+        
+        <button id="play-again-btn" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+            Jogar Novamente <i class="fas fa-redo ml-2"></i>
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
