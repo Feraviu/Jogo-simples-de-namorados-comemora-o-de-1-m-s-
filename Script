@@ -1,0 +1,240 @@
+// Frases românticas para o jogo
+const loveMessages = [
+    "Nosso primeiro beijo",
+    "Seu sorriso ilumina meu dia",
+    "Cada momento contigo é especial",
+    "Você é meu porto seguro",
+    "Amo a forma como você me olha",
+    "Nosso primeiro encontro",
+    "Seu abraço é meu lugar favorito",
+    "Amo como você me faz rir"
+];
+
+let gameState = {
+    cards: [],
+    flippedCards: [],
+    matchedPairs: 0,
+    attempts: 0,
+    timer: null,
+    seconds: 0,
+    gameStarted: false
+};
+
+// Elementos DOM
+const startScreen = document.getElementById('start-screen');
+const gameContainer = document.getElementById('game-container');
+const messageScreen = document.getElementById('message-screen');
+const startBtn = document.getElementById('start-btn');
+const playAgainBtn = document.getElementById('play-again-btn');
+const timerElement = document.getElementById('timer');
+const attemptsElement = document.getElementById('attempts');
+const pairsElement = document.getElementById('pairs');
+const cardsGrid = gameContainer.querySelector('.grid');
+
+// Event Listeners
+startBtn.addEventListener('click', startGame);
+playAgainBtn.addEventListener('click', () => {
+    messageScreen.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+});
+
+// Iniciar o jogo
+function startGame() {
+    startScreen.classList.add('hidden');
+    gameContainer.classList.remove('hidden');
+    
+    // Duplicar e embaralhar as cartas
+    let gameCards = [...loveMessages, ...loveMessages];
+    gameCards = shuffleArray(gameCards);
+    
+    // Criar as cartas no DOM
+    cardsGrid.innerHTML = '';
+    gameState.cards = [];
+    
+    gameCards.forEach((message, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'card cursor-pointer';
+        cardElement.dataset.index = index;
+        
+        cardElement.innerHTML = `
+            <div class="card-inner">
+                <div class="card-front bg-white rounded-lg shadow-md flex items-center justify-center h-32">
+                    <i class="fas fa-heart text-4xl text-pink-400"></i>
+                </div>
+                <div class="card-back">
+                    <p class="text-sm font-medium">${message}</p>
+                </div>
+            </div>
+        `;
+        
+        cardElement.addEventListener('click', () => flipCard(cardElement, index));
+        cardsGrid.appendChild(cardElement);
+        gameState.cards.push({
+            element: cardElement,
+            content: message,
+            flipped: false,
+            matched: false
+        });
+    });
+    
+    // Resetar estado do jogo
+    gameState.flippedCards = [];
+    gameState.matchedPairs = 0;
+    gameState.attempts = 0;
+    gameState.seconds = 0;
+    gameState.gameStarted = false;
+    
+    attemptsElement.textContent = gameState.attempts;
+    pairsElement.textContent = `${gameState.matchedPairs}/8`;
+}
+
+// Virar carta
+function flipCard(cardElement, index) {
+    const card = gameState.cards[index];
+    
+    // Não fazer nada se a carta já estiver virada ou combinada
+    if (card.flipped || card.matched || gameState.flippedCards.length === 2) {
+        return;
+    }
+    
+    // Iniciar o timer no primeiro clique
+    if (!gameState.gameStarted) {
+        startTimer();
+        gameState.gameStarted = true;
+    }
+    
+    // Virar a carta
+    cardElement.classList.add('flipped');
+    card.flipped = true;
+    gameState.flippedCards.push(card);
+    
+    // Verificar se duas cartas estão viradas
+    if (gameState.flippedCards.length === 2) {
+        gameState.attempts++;
+        attemptsElement.textContent = gameState.attempts;
+        
+        // Verificar se as cartas combinam
+        if (gameState.flippedCards[0].content === gameState.flippedCards[1].content) {
+            // Cartas combinam
+            gameState.flippedCards[0].matched = true;
+            gameState.flippedCards[1].matched = true;
+            gameState.matchedPairs++;
+            pairsElement.textContent = `${gameState.matchedPairs}/8`;
+            
+            // Criar efeito de coração
+            createHeartEffect(cardElement);
+            
+            // Limpar cartas viradas
+            gameState.flippedCards = [];
+            
+            // Verificar se o jogo acabou
+            if (gameState.matchedPairs === 8) {
+                endGame();
+            }
+        } else {
+            // Cartas não combinam - virar de volta após um atraso
+            setTimeout(() => {
+                gameState.flippedCards.forEach(c => {
+                    c.element.classList.remove('flipped');
+                    c.flipped = false;
+                });
+                gameState.flippedCards = [];
+            }, 1000);
+        }
+    }
+}
+
+// Timer do jogo
+function startTimer() {
+    if (gameState.timer) {
+        clearInterval(gameState.timer);
+    }
+    
+    gameState.seconds = 0;
+    updateTimerDisplay();
+    
+    gameState.timer = setInterval(() => {
+        gameState.seconds++;
+        updateTimerDisplay();
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const minutes = Math.floor(gameState.seconds / 60);
+    const seconds = gameState.seconds % 60;
+    timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+// Finalizar jogo
+function endGame() {
+    clearInterval(gameState.timer);
+    
+    // Mostrar mensagem final
+    gameContainer.classList.add('hidden');
+    messageScreen.classList.remove('hidden');
+    
+    // Criar efeito de confete
+    createConfetti(messageScreen);
+}
+
+// Efeitos visuais
+function createHeartEffect(element) {
+    const heart = document.createElement('div');
+    heart.innerHTML = '<i class="fas fa-heart text-red-500"></i>';
+    heart.className = 'text-2xl absolute';
+    heart.style.top = '50%';
+    heart.style.left = '50%';
+    heart.style.transform = 'translate(-50%, -50%)';
+    heart.style.opacity = '0';
+    heart.style.transition = 'all 1s ease-out';
+    
+    element.appendChild(heart);
+    
+    setTimeout(() => {
+        heart.style.opacity = '1';
+        heart.style.transform = 'translate(-50%, -100%)';
+        heart.style.fontSize = '3rem';
+        
+        setTimeout(() => {
+            heart.remove();
+        }, 1000);
+    }, 10);
+}
+
+function createConfetti(element) {
+    const colors = ['#f472b6', '#ec4899', '#db2777', '#be185d', '#9d174d'];
+    
+    for (let i = 0; i < 30; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left = `${Math.random() * 100}%`;
+        confetti.style.top = `${Math.random() * 100}%`;
+        confetti.style.width = `${Math.random() * 10 + 5}px`;
+        confetti.style.height = `${Math.random() * 10 + 5}px`;
+        confetti.style.borderRadius = '50%';
+        
+        element.appendChild(confetti);
+        
+        setTimeout(() => {
+            confetti.style.transition = 'all 1s ease-out';
+            confetti.style.opacity = '1';
+            confetti.style.transform = `translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 + 100}px) rotate(${Math.random() * 360}deg)`;
+            confetti.style.opacity = '0';
+            
+            setTimeout(() => {
+                confetti.remove();
+            }, 1000);
+        }, 10);
+    }
+}
+
+// Funções utilitárias
+function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
